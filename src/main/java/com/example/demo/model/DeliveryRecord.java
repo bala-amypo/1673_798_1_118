@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "deliveries")
+@Table(name = "delivery_records")
 public class DeliveryRecord {
 
     @Id
@@ -26,15 +26,6 @@ public class DeliveryRecord {
     public DeliveryRecord() {
     }
 
-    @PrePersist
-    @PreUpdate
-    public void validate() {
-        if (deliveredQuantity == null || deliveredQuantity < 0) {
-            throw new IllegalArgumentException("deliveredQuantity must be >= 0");
-        }
-    }
-
-    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

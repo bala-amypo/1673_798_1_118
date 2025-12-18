@@ -32,14 +32,6 @@ public class PurchaseOrderRecord {
     public PurchaseOrderRecord() {
     }
 
-    @PrePersist
-    public void validate() {
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("quantity must be > 0");
-        }
-    }
-
-    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
