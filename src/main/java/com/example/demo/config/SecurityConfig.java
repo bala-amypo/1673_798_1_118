@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtTokenProvider jwtTokenProvider() {
-        // secret just for tests; in real app move to config
+        // simple secret for tests
         return new JwtTokenProvider("mysecretkeymysecretkeymysecretkey", 3600000L);
     }
 
