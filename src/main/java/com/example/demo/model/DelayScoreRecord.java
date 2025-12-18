@@ -40,8 +40,6 @@ public class DelayScoreRecord {
         }
     }
 
-    // getters and setters
-
     public Long getId() {
         return id;
     }
