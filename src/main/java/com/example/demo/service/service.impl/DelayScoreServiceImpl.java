@@ -16,7 +16,8 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class DelayScoreServiceImpl implements DelayScoreService {
+public class DelayScoreServiceImpl implements DelayScoreService 
+ {
 
     private final DelayScoreRecordRepository delayScoreRepository;
     private final PurchaseOrderRecordRepository poRepository;
@@ -38,7 +39,10 @@ public class DelayScoreServiceImpl implements DelayScoreService {
     }
 
     @Override
-    public DelayScoreRecord computeScore(Long poId) {
+    public DelayScoreRecord computeDelayScore(Long poId) {
+    
+}
+ {
         PurchaseOrderRecord po = poRepository.findById(poId)
                 .orElseThrow(() -> new BadRequestException("Invalid poId"));
 
