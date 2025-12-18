@@ -77,21 +77,21 @@
             <version>${springdoc.version}</version>
         </dependency>
 
-        <!-- Servlet API for @WebServlet -->
+        <!-- Servlet API for @WebServlet SimpleStatusServlet -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!-- Spring Boot test starter (kept) -->
+        <!-- Spring Boot test starter (JUnit etc.) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- TestNG for the platform test suite -->
+        <!-- TestNG, required by the platform's tests -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
