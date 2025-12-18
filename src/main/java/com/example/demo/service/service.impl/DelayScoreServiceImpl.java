@@ -41,7 +41,7 @@ public class DelayScoreServiceImpl implements DelayScoreService
     @Override
     public DelayScoreRecord computeDelayScore(Long poId) {
     
-}
+
  {
         PurchaseOrderRecord po = poRepository.findById(poId)
                 .orElseThrow(() -> new BadRequestException("Invalid poId"));
