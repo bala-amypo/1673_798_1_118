@@ -22,6 +22,7 @@
         <java.version>17</java.version>
         <jjwt.version>0.11.5</jjwt.version>
         <springdoc.version>2.5.0</springdoc.version>
+        <testng.version>7.10.2</testng.version>
     </properties>
 
     <dependencies>
@@ -76,17 +77,25 @@
             <version>${springdoc.version}</version>
         </dependency>
 
-        <!-- Servlet API (for @WebServlet SimpleStatusServlet) -->
+        <!-- Servlet API for @WebServlet -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!-- Tests -->
+        <!-- Spring Boot test starter (kept) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- TestNG for the platform test suite -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
