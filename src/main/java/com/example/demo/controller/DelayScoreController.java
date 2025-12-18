@@ -18,7 +18,7 @@ public class DelayScoreController {
 
     @PostMapping("/compute/{poId}")
     public DelayScoreRecord compute(@PathVariable Long poId) {
-        return delayScoreService.computeScore(poId);
+        return delayScoreService.computeDelayScore(poId);
     }
 
     @GetMapping("/supplier/{supplierId}")

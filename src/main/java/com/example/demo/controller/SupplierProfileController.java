@@ -32,12 +32,13 @@ public class SupplierProfileController {
     }
 
     @PutMapping("/{id}/status")
-    public SupplierProfile updateStatus(@PathVariable Long id, @RequestParam boolean active) {
+    public SupplierProfile updateStatus(@PathVariable Long id,
+                                        @RequestParam boolean active) {
         return supplierProfileService.updateSupplierStatus(id, active);
     }
 
     @GetMapping("/lookup/{supplierCode}")
-    public SupplierProfile getByCode(@PathVariable String supplierCode) {
+    public SupplierProfile lookup(@PathVariable String supplierCode) {
         return supplierProfileService.getBySupplierCode(supplierCode);
     }
 }
