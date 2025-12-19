@@ -3,18 +3,22 @@ package com.example.demo.security;
 import com.example.demo.model.AppUser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 
+@Component
 public class JwtTokenProvider {
 
     private final Key key;
     private final long validityInMs;
 
-    public JwtTokenProvider(String secret, long validityInMs) {
+    public JwtTokenProvider() {
+        // simple hard-coded secret and validity for assignment/demo
+        String secret = "my-demo-secret-key-my-demo-secret-key"; // at least 32 chars
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
-        this.validityInMs = validityInMs;
+        this.validityInMs = 3600000L; // 1 hour
     }
 
     public String generateToken(AppUser user) {
