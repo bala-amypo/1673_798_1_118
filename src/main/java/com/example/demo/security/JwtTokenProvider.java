@@ -1,5 +1,6 @@
 package com.example.demo.security;
 
+import com.example.demo.model.AppUser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
@@ -16,20 +17,19 @@ public class JwtTokenProvider {
         this.validityInMs = validityInMs;
     }
 
-    public String generateToken(String subject) {
+    public String generateToken(AppUser user) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + validityInMs);
 
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(user.getEmail())
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole())
+                .claim("userId", user.getId())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    public String getSubject(String token) {
-        return parseClaims(token).getBody().getSubject();
     }
 
     public boolean validateToken(String token) {
@@ -39,6 +39,14 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException ex) {
             return false;
         }
+    }
+
+    public String getEmailFromToken(String token) {
+        return parseClaims(token).getBody().get("email", String.class);
+    }
+
+    public String getRoleFromToken(String token) {
+        return parseClaims(token).getBody().get("role", String.class);
     }
 
     private Jws<Claims> parseClaims(String token) {
