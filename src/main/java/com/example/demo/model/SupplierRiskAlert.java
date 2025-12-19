@@ -1,34 +1,60 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "supplier_risk_alert")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "supplier_risk_alerts")
 public class SupplierRiskAlert {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false)
     private Long supplierId;
-    private String alertLevel;
+
+    @Column(nullable = false)
+    private String alertLevel; // LOW / MEDIUM / HIGH
+
+    @Column(nullable = false)
     private String message;
-    
-    @Column(name = "alert_date")
+
+    @Column(nullable = false)
     private LocalDateTime alertDate;
-    
-    private Boolean resolved = false;
-    
+
+    @Column(nullable = false)
+    private Boolean resolved;
+
+    public SupplierRiskAlert() {
+    }
+
     @PrePersist
-    protected void onCreate() {
+    public void prePersist() {
         if (alertDate == null) {
             alertDate = LocalDateTime.now();
         }
+        if (resolved == null) {
+            resolved = Boolean.FALSE;
+        }
     }
+
+    // getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getSupplierId() { return supplierId; }
+    public void setSupplierId(Long supplierId) { this.supplierId = supplierId; }
+
+    public String getAlertLevel() { return alertLevel; }
+    public void setAlertLevel(String alertLevel) { this.alertLevel = alertLevel; }
+
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+
+    public LocalDateTime getAlertDate() { return alertDate; }
+    public void setAlertDate(LocalDateTime alertDate) { this.alertDate = alertDate; }
+
+    public Boolean getResolved() { return resolved; }
+    public void setResolved(Boolean resolved) { this.resolved = resolved; }
 }

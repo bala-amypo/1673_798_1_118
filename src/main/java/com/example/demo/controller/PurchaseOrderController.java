@@ -2,47 +2,37 @@ package com.example.demo.controller;
 
 import com.example.demo.model.PurchaseOrderRecord;
 import com.example.demo.service.PurchaseOrderService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/purchase-orders")
-@Tag(name = "Purchase Orders", description = "Purchase order management endpoints")
-@SecurityRequirement(name = "Bearer Authentication")
 public class PurchaseOrderController {
-    
-    private final PurchaseOrderService poService;
-    
-    public PurchaseOrderController(PurchaseOrderService poService) {
-        this.poService = poService;
+
+    private final PurchaseOrderService purchaseOrderService;
+
+    public PurchaseOrderController(PurchaseOrderService purchaseOrderService) {
+        this.purchaseOrderService = purchaseOrderService;
     }
-    
+
     @PostMapping
-    @Operation(summary = "Create a new purchase order")
-    public ResponseEntity<PurchaseOrderRecord> createPO(@RequestBody PurchaseOrderRecord po) {
-        return ResponseEntity.ok(poService.createPurchaseOrder(po));
+    public PurchaseOrderRecord create(@RequestBody PurchaseOrderRecord po) {
+        return purchaseOrderService.createPurchaseOrder(po);
     }
-    
+
     @GetMapping("/supplier/{supplierId}")
-    @Operation(summary = "Get purchase orders by supplier")
-    public ResponseEntity<List<PurchaseOrderRecord>> getPOsBySupplier(@PathVariable Long supplierId) {
-        return ResponseEntity.ok(poService.getPOsBySupplier(supplierId));
+    public List<PurchaseOrderRecord> getBySupplier(@PathVariable Long supplierId) {
+        return purchaseOrderService.getPOsBySupplier(supplierId);
     }
-    
+
     @GetMapping("/{id}")
-    @Operation(summary = "Get purchase order by ID")
-    public ResponseEntity<PurchaseOrderRecord> getPOById(@PathVariable Long id) {
-        return ResponseEntity.ok(poService.getPOById(id));
+    public PurchaseOrderRecord getById(@PathVariable Long id) {
+        return purchaseOrderService.getPOById(id);
     }
-    
+
     @GetMapping
-    @Operation(summary = "Get all purchase orders")
-    public ResponseEntity<List<PurchaseOrderRecord>> getAllPOs() {
-        return ResponseEntity.ok(poService.getAllPurchaseOrders());
+    public List<PurchaseOrderRecord> getAll() {
+        return purchaseOrderService.getAllPurchaseOrders();
     }
 }
