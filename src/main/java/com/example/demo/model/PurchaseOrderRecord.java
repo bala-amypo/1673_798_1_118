@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "purchase_orders")
+@Table(name = "purchase_order_records")
 public class PurchaseOrderRecord {
 
     @Id
@@ -32,14 +32,20 @@ public class PurchaseOrderRecord {
     public PurchaseOrderRecord() {
     }
 
-    @PrePersist
-    public void validate() {
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("quantity must be > 0");
-        }
+    public PurchaseOrderRecord(String poNumber,
+                               Long supplierId,
+                               String itemDescription,
+                               Integer quantity,
+                               LocalDate promisedDeliveryDate,
+                               LocalDate issuedDate) {
+        this.poNumber = poNumber;
+        this.supplierId = supplierId;
+        this.itemDescription = itemDescription;
+        this.quantity = quantity;
+        this.promisedDeliveryDate = promisedDeliveryDate;
+        this.issuedDate = issuedDate;
     }
 
-    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
