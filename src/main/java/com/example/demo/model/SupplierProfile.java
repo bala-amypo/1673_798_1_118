@@ -32,6 +32,18 @@ public class SupplierProfile {
     public SupplierProfile() {
     }
 
+    public SupplierProfile(String supplierCode,
+                           String supplierName,
+                           String email,
+                           String phone,
+                           Boolean active) {
+        this.supplierCode = supplierCode;
+        this.supplierName = supplierName;
+        this.email = email;
+        this.phone = phone;
+        this.active = active;
+    }
+
     @PrePersist
     public void prePersist() {
         if (createdAt == null) {
@@ -42,7 +54,6 @@ public class SupplierProfile {
         }
     }
 
-    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
