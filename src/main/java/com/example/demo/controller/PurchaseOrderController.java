@@ -21,14 +21,15 @@ public class PurchaseOrderController {
         return purchaseOrderService.createPurchaseOrder(po);
     }
 
+    @GetMapping("/{id}")
+    public PurchaseOrderRecord getById(@PathVariable Long id) {
+        return purchaseOrderService.getPOById(id)
+                .orElse(null);
+    }
+
     @GetMapping("/supplier/{supplierId}")
     public List<PurchaseOrderRecord> getBySupplier(@PathVariable Long supplierId) {
         return purchaseOrderService.getPOsBySupplier(supplierId);
-    }
-
-    @GetMapping("/{id}")
-    public PurchaseOrderRecord getById(@PathVariable Long id) {
-        return purchaseOrderService.getPOById(id);
     }
 
     @GetMapping

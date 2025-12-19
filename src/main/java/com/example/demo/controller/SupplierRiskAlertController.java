@@ -21,19 +21,14 @@ public class SupplierRiskAlertController {
         return supplierRiskAlertService.createAlert(alert);
     }
 
-    @PutMapping("/{id}/resolve")
-    public SupplierRiskAlert resolve(@PathVariable Long id) {
-        return supplierRiskAlertService.resolveAlert(id);
-    }
-
     @GetMapping("/supplier/{supplierId}")
     public List<SupplierRiskAlert> getBySupplier(@PathVariable Long supplierId) {
         return supplierRiskAlertService.getAlertsBySupplier(supplierId);
     }
 
-    @GetMapping("/{id}")
-    public SupplierRiskAlert getById(@PathVariable Long id) {
-        return supplierRiskAlertService.getAlertById(id);
+    @PutMapping("/{id}/resolve")
+    public SupplierRiskAlert resolve(@PathVariable Long id) {
+        return supplierRiskAlertService.resolveAlert(id);
     }
 
     @GetMapping

@@ -26,11 +26,6 @@ public class DeliveryRecordController {
         return deliveryRecordService.getDeliveriesByPO(poId);
     }
 
-    @GetMapping("/{id}")
-    public DeliveryRecord getById(@PathVariable Long id) {
-        return deliveryRecordService.getDeliveryById(id);
-    }
-
     @GetMapping
     public List<DeliveryRecord> getAll() {
         return deliveryRecordService.getAllDeliveries();
