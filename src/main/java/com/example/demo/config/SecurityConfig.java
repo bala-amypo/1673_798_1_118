@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtTokenProvider jwtTokenProvider() {
-        // secret just for tests; in real app move to config
+        // long enough secret for HS256
         return new JwtTokenProvider("mysecretkeymysecretkeymysecretkey", 3600000L);
     }
 
@@ -42,8 +42,10 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/status",
-                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/**",
+                                         "/swagger-ui/**",
+                                         "/v3/api-docs/**",
+                                         "/status").permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
