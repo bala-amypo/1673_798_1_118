@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "app_users")
@@ -14,15 +15,31 @@ public class AppUser {
     private String email;
 
     @Column(nullable = false)
-    private String password;
+    private String password; // BCrypt hash
+
+    // ADMIN / ANALYST / MANAGER
+    @Column(nullable = false)
+    private String role;
 
     @Column(nullable = false)
-    private String role; // ADMIN / ANALYST / MANAGER
+    private LocalDateTime createdAt;
 
     public AppUser() {
     }
 
-    // getters and setters
+    public AppUser(String email, String password, String role) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -34,4 +51,7 @@ public class AppUser {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

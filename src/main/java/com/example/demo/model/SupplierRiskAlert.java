@@ -14,8 +14,9 @@ public class SupplierRiskAlert {
     @Column(nullable = false)
     private Long supplierId;
 
+    // LOW / MEDIUM / HIGH
     @Column(nullable = false)
-    private String alertLevel; // LOW / MEDIUM / HIGH
+    private String alertLevel;
 
     @Column(nullable = false)
     private String message;
@@ -29,6 +30,15 @@ public class SupplierRiskAlert {
     public SupplierRiskAlert() {
     }
 
+    public SupplierRiskAlert(Long supplierId,
+                             String alertLevel,
+                             String message) {
+        this.supplierId = supplierId;
+        this.alertLevel = alertLevel;
+        this.message = message;
+        this.resolved = Boolean.FALSE;
+    }
+
     @PrePersist
     public void prePersist() {
         if (alertDate == null) {
@@ -39,7 +49,6 @@ public class SupplierRiskAlert {
         }
     }
 
-    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
