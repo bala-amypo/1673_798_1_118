@@ -1,48 +1,54 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.JwtResponse;
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.RegisterRequest;
 import com.example.demo.exception.BadRequestException;
 import com.example.demo.model.AppUser;
 import com.example.demo.repository.AppUserRepository;
+import com.example.demo.security.JwtTokenProvider;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
 
 @Service
-@Transactional
 public class AuthServiceImpl implements AuthService {
-    
-    private final AppUserRepository userRepository;
+
+    private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
-    
-    public AuthServiceImpl(AppUserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public AuthServiceImpl(AppUserRepository appUserRepository,
+                           PasswordEncoder passwordEncoder,
+                           AuthenticationManager authenticationManager,
+                           JwtTokenProvider jwtTokenProvider) {
+        this.appUserRepository = appUserRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
-    
+
     @Override
-    public AppUser registerUser(AppUser user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new BadRequestException("Email already exists");
-        }
-        
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRoles() == null) {
-            user.setRoles(new HashSet<>());
-        }
-        
-        return userRepository.save(user);
+    public void register(RegisterRequest request) {
+        appUserRepository.findByEmail(request.getEmail())
+                .ifPresent(u -> { throw new BadRequestException("email unique"); });
+
+        AppUser user = new AppUser();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(request.getRole());
+        appUserRepository.save(user);
     }
-    
+
     @Override
-    public AppUser findByUsername(String username) {
-        return userRepository.findByEmail(username)
-                .orElseThrow(() -> new BadRequestException("User not found with email: " + username));
-    }
-    
-    @Override
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+    public JwtResponse login(LoginRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(), request.getPassword()));
+
+        String token = jwtTokenProvider.generateToken(request.getEmail());
+        return new JwtResponse(token);
     }
 }
