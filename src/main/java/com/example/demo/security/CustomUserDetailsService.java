@@ -19,9 +19,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser user = appUserRepository.findByEmail(username)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        AppUser user = appUserRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole());
         return new User(user.getEmail(), user.getPassword(), Collections.singleton(authority));
     }
