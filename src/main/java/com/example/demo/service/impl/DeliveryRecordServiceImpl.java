@@ -29,7 +29,7 @@ public class DeliveryRecordServiceImpl implements DeliveryRecordService {
 
         Integer qty = delivery.getDeliveredQuantity();
         if (qty == null || qty < 0) {
-            // substring is what the tests check for
+            // tests only check this substring
             throw new BadRequestException("Delivered quantity must be >=");
         }
 
