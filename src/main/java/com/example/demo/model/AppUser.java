@@ -20,8 +20,9 @@ public class AppUser {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String role = "USER";  // Added role field
+    private Role role;  // Changed to Role ENUM
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -29,21 +30,21 @@ public class AppUser {
     // Default constructor
     public AppUser() {}
 
-    // 3-param constructor (existing)
+    // 3-param constructor
     public AppUser(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.role = "USER";
+        this.role = Role.USER;  // Use Role enum
         this.createdAt = LocalDateTime.now();
     }
 
-    // 4-param constructor (NEW - for AuthController)
-    public AppUser(String username, String email, String password, String role) {
+    // 4-param constructor for String role
+    public AppUser(String username, String email, String password, String roleStr) {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.role = role;
+        this.role = Role.valueOf(roleStr.toUpperCase());  // Convert String to Role enum
         this.createdAt = LocalDateTime.now();
     }
 
@@ -60,8 +61,9 @@ public class AppUser {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getRole() { return role; }  // ADDED getRole()
-    public void setRole(String role) { this.role = role; }
+    public Role getRole() { return role; }  // Returns Role enum
+    public void setRole(Role role) { this.role = role; }
+    public void setRole(String roleStr) { this.role = Role.valueOf(roleStr.toUpperCase()); }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
