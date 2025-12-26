@@ -5,13 +5,11 @@ import com.example.demo.model.SupplierProfile;
 import com.example.demo.repository.SupplierProfileRepository;
 import com.example.demo.service.SupplierProfileService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class SupplierProfileServiceImpl implements SupplierProfileService {
-
     private final SupplierProfileRepository supplierProfileRepository;
 
     public SupplierProfileServiceImpl(SupplierProfileRepository supplierProfileRepository) {
@@ -20,15 +18,13 @@ public class SupplierProfileServiceImpl implements SupplierProfileService {
 
     @Override
     public SupplierProfile createSupplier(SupplierProfile supplier) {
-        // test stubs save() to return created supplier
         return supplierProfileRepository.save(supplier);
     }
 
     @Override
     public SupplierProfile getSupplierById(Long id) {
-        // for 404 test, repo is stubbed to return Optional.empty()
         return supplierProfileRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found")); // 
     }
 
     @Override

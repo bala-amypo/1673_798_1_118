@@ -5,12 +5,10 @@ import com.example.demo.model.SupplierRiskAlert;
 import com.example.demo.repository.SupplierRiskAlertRepository;
 import com.example.demo.service.SupplierRiskAlertService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
 public class SupplierRiskAlertServiceImpl implements SupplierRiskAlertService {
-
     private final SupplierRiskAlertRepository riskAlertRepository;
 
     public SupplierRiskAlertServiceImpl(SupplierRiskAlertRepository riskAlertRepository) {
@@ -19,7 +17,6 @@ public class SupplierRiskAlertServiceImpl implements SupplierRiskAlertService {
 
     @Override
     public SupplierRiskAlert createAlert(SupplierRiskAlert alert) {
-        // default resolved=false if not set
         if (alert.getResolved() == null) {
             alert.setResolved(false);
         }

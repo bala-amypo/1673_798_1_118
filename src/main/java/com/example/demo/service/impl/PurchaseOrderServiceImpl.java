@@ -7,18 +7,15 @@ import com.example.demo.repository.PurchaseOrderRecordRepository;
 import com.example.demo.repository.SupplierProfileRepository;
 import com.example.demo.service.PurchaseOrderService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class PurchaseOrderServiceImpl implements PurchaseOrderService {
-
     private final PurchaseOrderRecordRepository poRepository;
     private final SupplierProfileRepository supplierProfileRepository;
 
-    public PurchaseOrderServiceImpl(PurchaseOrderRecordRepository poRepository,
-                                    SupplierProfileRepository supplierProfileRepository) {
+    public PurchaseOrderServiceImpl(PurchaseOrderRecordRepository poRepository, SupplierProfileRepository supplierProfileRepository) {
         this.poRepository = poRepository;
         this.supplierProfileRepository = supplierProfileRepository;
     }
@@ -26,11 +23,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     public PurchaseOrderRecord createPurchaseOrder(PurchaseOrderRecord po) {
         SupplierProfile supplier = supplierProfileRepository.findById(po.getSupplierId())
-                .orElseThrow(() -> new BadRequestException("Invalid supplierId"));
+                .orElseThrow(() -> new BadRequestException("Invalid supplierId")); // [cite: 28, 940]
 
         if (supplier.getActive() == null || !supplier.getActive()) {
-            // used in testCreatePurchaseOrder_inactiveSupplier
-            throw new BadRequestException("must be active");
+            throw new BadRequestException("must be active"); // [cite: 31, 940]
         }
 
         if (po.getQuantity() == null || po.getQuantity() <= 0) {

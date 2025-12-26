@@ -35,8 +35,8 @@ public class SupplierRiskAlert {
 
     @PrePersist
     protected void onCreate() {
-        if (alertDate == null) alertDate = LocalDateTime.now();
-        if (resolved == null) resolved = false;
+        if (alertDate == null) alertDate = LocalDateTime.now(); //
+        if (resolved == null) resolved = false; //
     }
 
     // Getters/Setters
