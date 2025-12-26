@@ -23,19 +23,32 @@ public class SupplierRiskAlert {
     private LocalDateTime alertDate;
 
     @Column(nullable = false)
-    private Boolean resolved = false; // Initialize to match test expectations [cite: 930]
+    private Boolean resolved = false;
 
     public SupplierRiskAlert() {}
+
+    public SupplierRiskAlert(Long supplierId, String alertLevel, String message) {
+        this.supplierId = supplierId;
+        this.alertLevel = alertLevel;
+        this.message = message;
+    }
 
     @PrePersist
     protected void onCreate() {
         if (alertDate == null) alertDate = LocalDateTime.now();
-        if (resolved == null) resolved = false; // Fixes testAlertCreationDefaultResolvedFalse [cite: 931]
+        if (resolved == null) resolved = false;
     }
 
-    // Standard Getters and Setters...
-    public Boolean getResolved() { return resolved; }
-    public void setResolved(Boolean resolved) { this.resolved = resolved; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public Long getSupplierId() { return supplierId; }
     public void setSupplierId(Long supplierId) { this.supplierId = supplierId; }
+    public String getAlertLevel() { return alertLevel; }
+    public void setAlertLevel(String alertLevel) { this.alertLevel = alertLevel; }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+    public LocalDateTime getAlertDate() { return alertDate; }
+    public void setAlertDate(LocalDateTime alertDate) { this.alertDate = alertDate; }
+    public Boolean getResolved() { return resolved; }
+    public void setResolved(Boolean resolved) { this.resolved = resolved; }
 }
