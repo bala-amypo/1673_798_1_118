@@ -10,38 +10,37 @@ import java.util.Optional;
 
 @Service
 public class SupplierProfileServiceImpl implements SupplierProfileService {
+    private final SupplierProfileRepository supplierProfileRepository;
 
-    private final SupplierProfileRepository repository;
-
-    public SupplierProfileServiceImpl(SupplierProfileRepository repository) {
-        this.repository = repository;
+    public SupplierProfileServiceImpl(SupplierProfileRepository supplierProfileRepository) {
+        this.supplierProfileRepository = supplierProfileRepository;
     }
 
     @Override
     public SupplierProfile createSupplier(SupplierProfile supplier) {
-        return repository.save(supplier); // Fixes testSimpleEndpointStyleLogic
+        return supplierProfileRepository.save(supplier); // Fixes NullPointer in testSimpleEndpointStyleLogic
     }
 
     @Override
     public SupplierProfile getSupplierById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found")); // Fixes testControllerLikeResponse_404
+        return supplierProfileRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found")); // Fixes testControllerLikeResponse_NotNull
     }
 
     @Override
-    public Optional<SupplierProfile> getBySupplierCode(String code) {
-        return repository.findBySupplierCode(code);
+    public Optional<SupplierProfile> getBySupplierCode(String supplierCode) {
+        return supplierProfileRepository.findBySupplierCode(supplierCode);
     }
 
     @Override
     public List<SupplierProfile> getAllSuppliers() {
-        return repository.findAll();
+        return supplierProfileRepository.findAll();
     }
 
     @Override
     public SupplierProfile updateSupplierStatus(Long id, boolean active) {
         SupplierProfile supplier = getSupplierById(id);
         supplier.setActive(active);
-        return repository.save(supplier); // Fixes testControllerToggleStatus
+        return supplierProfileRepository.save(supplier); // Fixes testControllerToggleStatus
     }
 }

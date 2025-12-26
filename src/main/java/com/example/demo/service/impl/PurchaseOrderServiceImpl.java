@@ -12,39 +12,37 @@ import java.util.Optional;
 
 @Service
 public class PurchaseOrderServiceImpl implements PurchaseOrderService {
+    private final PurchaseOrderRecordRepository poRepository;
+    private final SupplierProfileRepository supplierProfileRepository;
 
-    private final PurchaseOrderRecordRepository poRepo;
-    private final SupplierProfileRepository supplierRepo;
-
-    public PurchaseOrderServiceImpl(PurchaseOrderRecordRepository poRepo, SupplierProfileRepository supplierRepo) {
-        this.poRepo = poRepo;
-        this.supplierRepo = supplierRepo;
+    public PurchaseOrderServiceImpl(PurchaseOrderRecordRepository poRepository, SupplierProfileRepository supplierProfileRepository) {
+        this.poRepository = poRepository;
+        this.supplierProfileRepository = supplierProfileRepository;
     }
 
     @Override
     public PurchaseOrderRecord createPurchaseOrder(PurchaseOrderRecord po) {
-        SupplierProfile supplier = supplierRepo.findById(po.getSupplierId())
+        SupplierProfile supplier = supplierProfileRepository.findById(po.getSupplierId())
                 .orElseThrow(() -> new BadRequestException("Invalid supplierId")); // Fixes testCreatePurchaseOrder_success
 
         if (supplier.getActive() == null || !supplier.getActive()) {
             throw new BadRequestException("must be active"); // Fixes testCreatePurchaseOrder_inactiveSupplier
         }
-
-        return poRepo.save(po);
+        return poRepository.save(po);
     }
 
     @Override
     public List<PurchaseOrderRecord> getPOsBySupplier(Long supplierId) {
-        return poRepo.findBySupplierId(supplierId);
+        return poRepository.findBySupplierId(supplierId);
     }
 
     @Override
     public Optional<PurchaseOrderRecord> getPOById(Long id) {
-        return poRepo.findById(id);
+        return poRepository.findById(id);
     }
 
     @Override
     public List<PurchaseOrderRecord> getAllPurchaseOrders() {
-        return poRepo.findAll();
+        return poRepository.findAll();
     }
 }
