@@ -17,27 +17,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
-
-    // JWT provider bean
+    // 1) JwtTokenProvider bean
     @Bean
     public JwtTokenProvider jwtTokenProvider() {
         return new JwtTokenProvider();
     }
 
-    // Authentication filter bean (this fixes “bean not found”)
+    // 2) JwtAuthenticationFilter bean
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
                                                            CustomUserDetailsService customUserDetailsService) {
         return new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService);
     }
 
+    // 3) Security filter chain
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
@@ -57,12 +53,14 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // 4) AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
             throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+    // 5) Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
