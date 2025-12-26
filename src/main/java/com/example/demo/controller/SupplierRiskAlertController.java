@@ -2,36 +2,35 @@ package com.example.demo.controller;
 
 import com.example.demo.model.SupplierRiskAlert;
 import com.example.demo.service.SupplierRiskAlertService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/risk-alerts")
 public class SupplierRiskAlertController {
-
-    private final SupplierRiskAlertService supplierRiskAlertService;
-
-    public SupplierRiskAlertController(SupplierRiskAlertService supplierRiskAlertService) {
-        this.supplierRiskAlertService = supplierRiskAlertService;
-    }
+    
+    @Autowired
+    private SupplierRiskAlertService service;
 
     @PostMapping
-    public SupplierRiskAlert create(@RequestBody SupplierRiskAlert alert) {
-        return supplierRiskAlertService.createAlert(alert);
+    public ResponseEntity<SupplierRiskAlert> createAlert(@RequestBody SupplierRiskAlert alert) {
+        return ResponseEntity.ok(service.createAlert(alert));
     }
 
     @GetMapping("/supplier/{supplierId}")
-    public List<SupplierRiskAlert> getBySupplier(@PathVariable Long supplierId) {
-        return supplierRiskAlertService.getAlertsBySupplier(supplierId);
+    public ResponseEntity<List<SupplierRiskAlert>> getAlertsBySupplier(@PathVariable Long supplierId) {
+        return ResponseEntity.ok(service.getAlertsBySupplier(supplierId));
     }
 
-    @PutMapping("/{id}/resolve")
-    public SupplierRiskAlert resolve(@PathVariable Long id) {
-        return supplierRiskAlertService.resolveAlert(id);
+    @PutMapping("/{alertId}/resolve")
+    public ResponseEntity<SupplierRiskAlert> resolveAlert(@PathVariable Long alertId) {
+        return ResponseEntity.ok(service.resolveAlert(alertId));
     }
 
     @GetMapping
-    public List<SupplierRiskAlert> getAll() {
-        return supplierRiskAlertService.getAllAlerts();
+    public ResponseEntity<List<SupplierRiskAlert>> getAllAlerts() {
+        return ResponseEntity.ok(service.getAllAlerts());
     }
 }
