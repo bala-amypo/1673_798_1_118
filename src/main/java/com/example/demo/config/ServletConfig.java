@@ -9,11 +9,10 @@ import org.springframework.context.annotation.Configuration;
 public class ServletConfig {
 
     @Bean
-    public ServletRegistrationBean<SimpleStatusServlet> statusServlet() {
-        ServletRegistrationBean<SimpleStatusServlet> registrationBean = 
-            new ServletRegistrationBean<>(new SimpleStatusServlet());
-        registrationBean.setUrlMappings(java.util.List.of("/status"));
-        registrationBean.setLoadOnStartup(1);
-        return registrationBean;
+    public ServletRegistrationBean<SimpleStatusServlet> statusServletRegistration() {
+        ServletRegistrationBean<SimpleStatusServlet> registration = 
+                new ServletRegistrationBean<>(new SimpleStatusServlet());
+        registration.addUrlMappings("/status");
+        return registration;
     }
 }
