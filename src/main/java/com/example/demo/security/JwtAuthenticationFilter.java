@@ -1,66 +1,58 @@
 package com.example.demo.security;
 
-import com.example.demo.model.AppUser;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
+import java.io.IOException;
 
-public class JwtTokenProvider {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final SecretKey secretKey;
-    private final long validityInMs = 3600000; // 1 hour
+    private final JwtTokenProvider jwtTokenProvider;
+    private final CustomUserDetailsService userDetailsService;
 
-    public JwtTokenProvider() {
-        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
+                                   CustomUserDetailsService userDetailsService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = userDetailsService;
     }
 
-    public String generateToken(AppUser user) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMs);
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
-        return Jwts.builder()
-                .setSubject(user.getUsername())              // 0.11.5 API
-                .setIssuedAt(now)
-                .setExpiration(expiry)
-                .claim("role", user.getRole())
-                .signWith(SignatureAlgorithm.HS256, secretKey) // 0.11.5 API
-                .compact();
-    }
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+        String username = null;
 
-    public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)                     // 0.11.5 API
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
-    }
-
-    // Kept for JwtAuthenticationFilter which calls getUsernameFromJWT(...)
-    public String getUsernameFromJWT(String token) {
-        return getUsernameFromToken(token);
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .setSigningKey(secretKey)                 // 0.11.5 API
-                    .parseClaimsJws(token);
-            return true;
-        } catch (Exception ex) {
-            return false;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            if (jwtTokenProvider.validateToken(token)) {
+                username = jwtTokenProvider.getUsernameFromJWT(token);
+            }
         }
-    }
 
-    public String getRoleFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
-        Object role = claims.get("role");
-        return role != null ? role.toString() : null;
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        filterChain.doFilter(request, response);
     }
 }

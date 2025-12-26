@@ -23,7 +23,7 @@ public class JwtTokenProvider {
         Date expiry = new Date(now.getTime() + validityInMs);
 
         return Jwts.builder()
-                .setSubject(user.getUsername())              // works with jjwt 0.11.5
+                .setSubject(user.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .claim("role", user.getRole())
@@ -39,7 +39,7 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    // Used by JwtAuthenticationFilter (method name it expects)
+    // Name used by JwtAuthenticationFilter
     public String getUsernameFromJWT(String token) {
         return getUsernameFromToken(token);
     }
