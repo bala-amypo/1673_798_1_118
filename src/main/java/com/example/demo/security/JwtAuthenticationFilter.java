@@ -1,60 +1,66 @@
 package com.example.demo.security;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
+import com.example.demo.model.AppUser;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
-import java.io.IOException;
+import javax.crypto.SecretKey;
+import java.util.Date;
 
-@Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtTokenProvider {
 
-    private final JwtTokenProvider jwtTokenProvider;
-    private final CustomUserDetailsService userDetailsService;
+    private final SecretKey secretKey;
+    private final long validityInMs = 3600000; // 1 hour
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, CustomUserDetailsService userDetailsService) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.userDetailsService = userDetailsService;
+    public JwtTokenProvider() {
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
-                                 FilterChain filterChain) throws ServletException, IOException {
-        
+    public String generateToken(AppUser user) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + validityInMs);
+
+        return Jwts.builder()
+                .setSubject(user.getUsername())              // 0.11.5 API
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .claim("role", user.getRole())
+                .signWith(SignatureAlgorithm.HS256, secretKey) // 0.11.5 API
+                .compact();
+    }
+
+    public String getUsernameFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)                     // 0.11.5 API
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    }
+
+    // Kept for JwtAuthenticationFilter which calls getUsernameFromJWT(...)
+    public String getUsernameFromJWT(String token) {
+        return getUsernameFromToken(token);
+    }
+
+    public boolean validateToken(String token) {
         try {
-            String jwtToken = extractJwtFromRequest(request);
-
-            if (StringUtils.hasText(jwtToken) && jwtTokenProvider.validateToken(jwtToken)) {
-                String username = jwtTokenProvider.getUsernameFromJWT(jwtToken);
-
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    UsernamePasswordAuthenticationToken authenticationToken = 
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
-            }
+            Jwts.parser()
+                    .setSigningKey(secretKey)                 // 0.11.5 API
+                    .parseClaimsJws(token);
+            return true;
         } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context", ex);
+            return false;
         }
-
-        filterChain.doFilter(request, response);
     }
 
-    private String extractJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
+    public String getRoleFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+        Object role = claims.get("role");
+        return role != null ? role.toString() : null;
     }
 }
