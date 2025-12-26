@@ -6,6 +6,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "delivery_records")
 public class DeliveryRecord {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

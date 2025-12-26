@@ -6,6 +6,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "purchase_order_records")
 public class PurchaseOrderRecord {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,8 +31,8 @@ public class PurchaseOrderRecord {
 
     public PurchaseOrderRecord() {}
 
-    public PurchaseOrderRecord(String poNumber, Long supplierId, String itemDescription, 
-                              Integer quantity, LocalDate promisedDeliveryDate, LocalDate issuedDate) {
+    public PurchaseOrderRecord(String poNumber, Long supplierId, String itemDescription,
+                               Integer quantity, LocalDate promisedDeliveryDate, LocalDate issuedDate) {
         this.poNumber = poNumber;
         this.supplierId = supplierId;
         this.itemDescription = itemDescription;
