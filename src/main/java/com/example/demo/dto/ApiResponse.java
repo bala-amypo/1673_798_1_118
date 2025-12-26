@@ -1,20 +1,17 @@
 package com.example.demo.dto;
 
-public class ApiResponse {
+public class ApiErrorResponse {
     private String message;
-    private boolean success;
+    private int status;
 
-    // Constructors
-    public ApiResponse() {}
-
-    public ApiResponse(String message, boolean success) {
+    public ApiErrorResponse(String message, int status) {
         this.message = message;
-        this.success = success;
+        this.status = status;
     }
 
-    // Getters/Setters
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
-    public boolean isSuccess() { return success; }
-    public void setSuccess(boolean success) { this.success = success; }
+    
+    public int getStatus() { return status; }
+    public void setStatus(int status) { this.status = status; }
 }
