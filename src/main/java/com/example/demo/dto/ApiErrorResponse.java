@@ -1,10 +1,10 @@
 package com.example.demo.dto;
 
-public class ApiResponse {
+public class ApiErrorResponse {
     private String message;
     private int status;
 
-    public ApiResponse(String message, int status) {
+    public ApiErrorResponse(String message, int status) {
         this.message = message;
         this.status = status;
     }
