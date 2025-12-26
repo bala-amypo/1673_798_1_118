@@ -1,31 +1,5 @@
-package com.example.demo.service.impl;
-
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.SupplierRiskAlert;
-import com.example.demo.repository.SupplierRiskAlertRepository;
-import com.example.demo.service.SupplierRiskAlertService;
-import org.springframework.stereotype.Service;
-import java.util.List;
-
 @Service
 public class SupplierRiskAlertServiceImpl implements SupplierRiskAlertService {
-    private final SupplierRiskAlertRepository riskAlertRepository;
-
-    public SupplierRiskAlertServiceImpl(SupplierRiskAlertRepository riskAlertRepository) {
-        this.riskAlertRepository = riskAlertRepository;
-    }
-
-    @Override
-    public SupplierRiskAlert createAlert(SupplierRiskAlert alert) {
-        if (alert.getResolved() == null) alert.setResolved(false);
-        return riskAlertRepository.save(alert); // Fixes NullPointer in testIoCBehaviorOnRiskAlertService
-    }
-
-    @Override
-    public List<SupplierRiskAlert> getAlertsBySupplier(Long supplierId) {
-        return riskAlertRepository.findBySupplierId(supplierId);
-    }
-
     @Override
     public SupplierRiskAlert resolveAlert(Long alertId) {
         SupplierRiskAlert alert = riskAlertRepository.findById(alertId)
@@ -33,9 +7,10 @@ public class SupplierRiskAlertServiceImpl implements SupplierRiskAlertService {
         alert.setResolved(true);
         return riskAlertRepository.save(alert);
     }
-
+    
     @Override
-    public List<SupplierRiskAlert> getAllAlerts() {
-        return riskAlertRepository.findAll();
+    public SupplierRiskAlert createAlert(SupplierRiskAlert alert) {
+        if (alert.getResolved() == null) alert.setResolved(false);
+        return riskAlertRepository.save(alert); // Fixes NullPointer in testIoCBehaviorOnRiskAlertService [cite: 420]
     }
 }
