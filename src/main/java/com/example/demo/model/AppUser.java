@@ -1,8 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "app_users")
@@ -22,38 +21,26 @@ public class AppUser {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.USER;
+    private Role role;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "app_user_roles",
-        joinColumns = @JoinColumn(name = "app_user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
-    // Constructors
     public AppUser() {}
 
-    public AppUser(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = Role.USER;
-        this.roles.add(Role.USER);
-    }
-
-    // FIX: Add this missing constructor
     public AppUser(String username, String email, String password, Role role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.roles = new HashSet<>();
-        this.roles.add(role);
     }
 
-    // All getters/setters
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    // Getters/Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getUsername() { return username; }
@@ -64,6 +51,6 @@ public class AppUser {
     public void setPassword(String password) { this.password = password; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
-    public Set<Role> getRoles() { return roles; }
-    public void setRoles(Set<Role> roles) { this.roles = roles; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

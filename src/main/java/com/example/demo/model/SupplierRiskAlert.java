@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "supplier_risk_alerts")
 public class SupplierRiskAlert {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -14,7 +13,6 @@ public class SupplierRiskAlert {
     @Column(nullable = false)
     private Long supplierId;
 
-    // LOW / MEDIUM / HIGH
     @Column(nullable = false)
     private String alertLevel;
 
@@ -25,45 +23,33 @@ public class SupplierRiskAlert {
     private LocalDateTime alertDate;
 
     @Column(nullable = false)
-    private Boolean resolved;
+    private Boolean resolved = false;
 
-    public SupplierRiskAlert() {
-    }
+    public SupplierRiskAlert() {}
 
-    public SupplierRiskAlert(Long supplierId,
-                             String alertLevel,
-                             String message) {
+    public SupplierRiskAlert(Long supplierId, String alertLevel, String message) {
         this.supplierId = supplierId;
         this.alertLevel = alertLevel;
         this.message = message;
-        this.resolved = Boolean.FALSE;
     }
 
     @PrePersist
-    public void prePersist() {
-        if (alertDate == null) {
-            alertDate = LocalDateTime.now();
-        }
-        if (resolved == null) {
-            resolved = Boolean.FALSE;
-        }
+    protected void onCreate() {
+        if (alertDate == null) alertDate = LocalDateTime.now();
+        if (resolved == null) resolved = false;
     }
 
+    // Getters/Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
     public Long getSupplierId() { return supplierId; }
     public void setSupplierId(Long supplierId) { this.supplierId = supplierId; }
-
     public String getAlertLevel() { return alertLevel; }
     public void setAlertLevel(String alertLevel) { this.alertLevel = alertLevel; }
-
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
-
     public LocalDateTime getAlertDate() { return alertDate; }
     public void setAlertDate(LocalDateTime alertDate) { this.alertDate = alertDate; }
-
     public Boolean getResolved() { return resolved; }
     public void setResolved(Boolean resolved) { this.resolved = resolved; }
 }
