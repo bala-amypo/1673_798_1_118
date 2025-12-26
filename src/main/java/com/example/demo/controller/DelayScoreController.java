@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.model.DelayScoreRecord;
 import com.example.demo.service.DelayScoreService;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController

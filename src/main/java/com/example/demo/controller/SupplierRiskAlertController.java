@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.model.SupplierRiskAlert;
 import com.example.demo.service.SupplierRiskAlertService;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
