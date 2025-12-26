@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.model.SupplierProfile;
 import com.example.demo.service.SupplierProfileService;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -32,8 +31,7 @@ public class SupplierProfileController {
     }
 
     @PutMapping("/{id}/status")
-    public SupplierProfile updateStatus(@PathVariable Long id,
-                                        @RequestParam boolean active) {
+    public SupplierProfile updateStatus(@PathVariable Long id, @RequestParam boolean active) {
         return supplierProfileService.updateSupplierStatus(id, active);
     }
 }
