@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.PurchaseOrderRecord;
 import com.example.demo.service.PurchaseOrderService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -16,22 +18,21 @@ public class PurchaseOrderController {
     }
 
     @PostMapping
-    public PurchaseOrderRecord create(@RequestBody PurchaseOrderRecord po) {
-        return purchaseOrderService.createPurchaseOrder(po);
+    public ResponseEntity<PurchaseOrderRecord> createPurchaseOrder(@RequestBody PurchaseOrderRecord po) {
+        PurchaseOrderRecord created = purchaseOrderService.createPurchaseOrder(po);
+        return ResponseEntity.ok(created);
     }
 
     @GetMapping("/supplier/{supplierId}")
-    public List<PurchaseOrderRecord> getBySupplier(@PathVariable Long supplierId) {
-        return purchaseOrderService.getPOsBySupplier(supplierId);
+    public ResponseEntity<List<PurchaseOrderRecord>> getPOsBySupplier(@PathVariable Long supplierId) {
+        List<PurchaseOrderRecord> pos = purchaseOrderService.getPOsBySupplier(supplierId);
+        return ResponseEntity.ok(pos);
     }
 
     @GetMapping("/{id}")
-    public PurchaseOrderRecord getById(@PathVariable Long id) {
-        return purchaseOrderService.getPOById(id).orElse(null);
-    }
-
-    @GetMapping
-    public List<PurchaseOrderRecord> getAll() {
-        return purchaseOrderService.getAllPurchaseOrders();
+    public ResponseEntity<PurchaseOrderRecord> getPOById(@PathVariable Long id) {
+        return purchaseOrderService.getPOById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

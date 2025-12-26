@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.DeliveryRecord;
 import com.example.demo.service.DeliveryRecordService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -16,17 +18,20 @@ public class DeliveryRecordController {
     }
 
     @PostMapping
-    public DeliveryRecord create(@RequestBody DeliveryRecord delivery) {
-        return deliveryRecordService.recordDelivery(delivery);
+    public ResponseEntity<DeliveryRecord> recordDelivery(@RequestBody DeliveryRecord delivery) {
+        DeliveryRecord recorded = deliveryRecordService.recordDelivery(delivery);
+        return ResponseEntity.ok(recorded);
     }
 
     @GetMapping("/po/{poId}")
-    public List<DeliveryRecord> getByPo(@PathVariable Long poId) {
-        return deliveryRecordService.getDeliveriesByPO(poId);
+    public ResponseEntity<List<DeliveryRecord>> getDeliveriesByPO(@PathVariable Long poId) {
+        List<DeliveryRecord> deliveries = deliveryRecordService.getDeliveriesByPO(poId);
+        return ResponseEntity.ok(deliveries);
     }
 
     @GetMapping
-    public List<DeliveryRecord> getAll() {
-        return deliveryRecordService.getAllDeliveries();
+    public ResponseEntity<List<DeliveryRecord>> getAllDeliveries() {
+        List<DeliveryRecord> deliveries = deliveryRecordService.getAllDeliveries();
+        return ResponseEntity.ok(deliveries);
     }
 }

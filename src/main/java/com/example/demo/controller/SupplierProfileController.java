@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.SupplierProfile;
 import com.example.demo.service.SupplierProfileService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -15,23 +17,27 @@ public class SupplierProfileController {
         this.supplierProfileService = supplierProfileService;
     }
 
-    @PostMapping
-    public SupplierProfile create(@RequestBody SupplierProfile supplier) {
-        return supplierProfileService.createSupplier(supplier);
-    }
-
     @GetMapping("/{id}")
-    public SupplierProfile getById(@PathVariable Long id) {
-        return supplierProfileService.getSupplierById(id);
+    public ResponseEntity<SupplierProfile> getSupplierById(@PathVariable Long id) {
+        SupplierProfile supplier = supplierProfileService.getSupplierById(id);
+        return ResponseEntity.ok(supplier);
     }
 
-    @GetMapping
-    public List<SupplierProfile> getAll() {
-        return supplierProfileService.getAllSuppliers();
+    @PostMapping
+    public ResponseEntity<SupplierProfile> createSupplier(@RequestBody SupplierProfile supplier) {
+        SupplierProfile created = supplierProfileService.createSupplier(supplier);
+        return ResponseEntity.ok(created);
     }
 
     @PutMapping("/{id}/status")
-    public SupplierProfile updateStatus(@PathVariable Long id, @RequestParam boolean active) {
-        return supplierProfileService.updateSupplierStatus(id, active);
+    public ResponseEntity<SupplierProfile> updateStatus(@PathVariable Long id, @RequestParam boolean active) {
+        SupplierProfile updated = supplierProfileService.updateSupplierStatus(id, active);
+        return ResponseEntity.ok(updated);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<SupplierProfile>> getAllSuppliers() {
+        List<SupplierProfile> suppliers = supplierProfileService.getAllSuppliers();
+        return ResponseEntity.ok(suppliers);
     }
 }
