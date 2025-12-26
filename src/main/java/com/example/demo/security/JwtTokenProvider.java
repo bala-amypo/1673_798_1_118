@@ -1,9 +1,11 @@
 package com.example.demo.security;
 
+import com.example.demo.model.AppUser;  // ← ADD THIS LINE
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -24,7 +26,7 @@ public class JwtTokenProvider {
 
     // Overloaded method for tests that pass AppUser directly
     public String generateToken(AppUser user) {
-        Authentication authentication = org.springframework.security.core.userdetails.User.builder()
+        Authentication authentication = User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
                 .authorities("ROLE_" + user.getRole())
