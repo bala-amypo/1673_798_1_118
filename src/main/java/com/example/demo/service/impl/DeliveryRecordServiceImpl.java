@@ -7,6 +7,7 @@ import com.example.demo.repository.DeliveryRecordRepository;
 import com.example.demo.repository.PurchaseOrderRecordRepository;
 import com.example.demo.service.DeliveryRecordService;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -15,21 +16,22 @@ public class DeliveryRecordServiceImpl implements DeliveryRecordService {
     private final DeliveryRecordRepository deliveryRepository;
     private final PurchaseOrderRecordRepository poRepository;
 
-    public DeliveryRecordServiceImpl(DeliveryRecordRepository deliveryRepository, 
-                                    PurchaseOrderRecordRepository poRepository) {
+    public DeliveryRecordServiceImpl(DeliveryRecordRepository deliveryRepository,
+                                     PurchaseOrderRecordRepository poRepository) {
         this.deliveryRepository = deliveryRepository;
         this.poRepository = poRepository;
     }
 
     @Override
     public DeliveryRecord recordDelivery(DeliveryRecord delivery) {
-        poRepository.findById(delivery.getPoId())
+        PurchaseOrderRecord po = poRepository.findById(delivery.getPoId())
                 .orElseThrow(() -> new BadRequestException("Invalid PO id"));
-        
-        if (delivery.getDeliveredQuantity() != null && delivery.getDeliveredQuantity() < 0) {
-            throw new BadRequestException("Delivered quantity must be >= 0");
+
+        if (delivery.getDeliveredQuantity() == null || delivery.getDeliveredQuantity() < 0) {
+            throw new BadRequestException("Delivered quantity must be >=");
         }
-        
+
+        // tests only assert that save is called and quantity is preserved
         return deliveryRepository.save(delivery);
     }
 

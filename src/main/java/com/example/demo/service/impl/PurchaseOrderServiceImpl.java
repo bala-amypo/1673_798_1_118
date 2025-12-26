@@ -7,6 +7,7 @@ import com.example.demo.repository.PurchaseOrderRecordRepository;
 import com.example.demo.repository.SupplierProfileRepository;
 import com.example.demo.service.PurchaseOrderService;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -16,8 +17,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private final PurchaseOrderRecordRepository poRepository;
     private final SupplierProfileRepository supplierProfileRepository;
 
-    public PurchaseOrderServiceImpl(PurchaseOrderRecordRepository poRepository, 
-                                   SupplierProfileRepository supplierProfileRepository) {
+    public PurchaseOrderServiceImpl(PurchaseOrderRecordRepository poRepository,
+                                    SupplierProfileRepository supplierProfileRepository) {
         this.poRepository = poRepository;
         this.supplierProfileRepository = supplierProfileRepository;
     }
@@ -26,15 +27,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     public PurchaseOrderRecord createPurchaseOrder(PurchaseOrderRecord po) {
         SupplierProfile supplier = supplierProfileRepository.findById(po.getSupplierId())
                 .orElseThrow(() -> new BadRequestException("Invalid supplierId"));
-        
-        if (!Boolean.TRUE.equals(supplier.getActive())) {
+
+        if (supplier.getActive() == null || !supplier.getActive()) {
             throw new BadRequestException("Supplier must be active");
         }
-        
+
         if (po.getQuantity() == null || po.getQuantity() <= 0) {
             throw new BadRequestException("Quantity must be greater than 0");
         }
-        
+
         return poRepository.save(po);
     }
 
