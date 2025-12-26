@@ -19,6 +19,7 @@ public class SupplierRiskAlertServiceImpl implements SupplierRiskAlertService {
 
     @Override
     public SupplierRiskAlert createAlert(SupplierRiskAlert alert) {
+        // default resolved=false if not set
         if (alert.getResolved() == null) {
             alert.setResolved(false);
         }

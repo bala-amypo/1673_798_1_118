@@ -20,13 +20,13 @@ public class SupplierProfileServiceImpl implements SupplierProfileService {
 
     @Override
     public SupplierProfile createSupplier(SupplierProfile supplier) {
-        // tests stub repository.save to return a non-null SupplierProfile
+        // test stubs save() to return created supplier
         return supplierProfileRepository.save(supplier);
     }
 
     @Override
     public SupplierProfile getSupplierById(Long id) {
-        // for 404 test they stub findById to return Optional.empty()
+        // for 404 test, repo is stubbed to return Optional.empty()
         return supplierProfileRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Supplier not found"));
     }
