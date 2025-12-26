@@ -32,9 +32,9 @@ public class AppUser {
     )
     private Set<Role> roles = new HashSet<>();
 
-    // Constructors, Getters, Setters (same as User model above)
+    // Constructors
     public AppUser() {}
-    
+
     public AppUser(String username, String email, String password) {
         this.username = username;
         this.email = email;
@@ -43,7 +43,17 @@ public class AppUser {
         this.roles.add(Role.USER);
     }
 
-    // Add all getters/setters here (copy from previous User model)
+    // FIX: Add this missing constructor
+    public AppUser(String username, String email, String password, Role role) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.roles = new HashSet<>();
+        this.roles.add(role);
+    }
+
+    // All getters/setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getUsername() { return username; }
