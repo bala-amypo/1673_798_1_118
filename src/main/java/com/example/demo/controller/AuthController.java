@@ -3,8 +3,12 @@ package com.example.demo.controller;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.model.AppUser;
+import com.example.demo.model.Role;
 import com.example.demo.repository.AppUserRepository;
 import com.example.demo.security.JwtTokenProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +49,11 @@ public class AuthController {
             throw new RuntimeException("Invalid credentials");
         }
         
-        return jwtTokenProvider.generateToken(user);
+        // Create Authentication object for JWT
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getEmail(), user.getPassword(), null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        
+        return jwtTokenProvider.generateToken(authentication);
     }
 }
