@@ -1,5 +1,8 @@
-// package com.example.demo.model;
+package com.example.demo.model;
 
-// public enum Role {
-//     ADMIN, ANALYST, MANAGER, USER
-// }
+public enum Role {
+    ADMIN,
+    ANALYST,
+    MANAGER,
+    USER
+}
