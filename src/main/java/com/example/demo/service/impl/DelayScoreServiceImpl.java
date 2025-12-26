@@ -1,107 +1,101 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.BadRequestException;
-import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.*;
 import com.example.demo.repository.*;
 import com.example.demo.service.DelayScoreService;
 import com.example.demo.service.SupplierRiskAlertService;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.Comparator;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
 public class DelayScoreServiceImpl implements DelayScoreService {
 
-    private final DelayScoreRecordRepository delayScoreRecordRepository;
-    private final PurchaseOrderRecordRepository poRepository;
-    private final DeliveryRecordRepository deliveryRepository;
-    private final SupplierProfileRepository supplierProfileRepository;
+    private final DelayScoreRecordRepository delayScoreRepo;
+    private final PurchaseOrderRecordRepository poRepo;
+    private final DeliveryRecordRepository deliveryRepo;
+    private final SupplierProfileRepository supplierRepo;
     private final SupplierRiskAlertService riskAlertService;
 
-    public DelayScoreServiceImpl(DelayScoreRecordRepository delayScoreRecordRepository,
-                                 PurchaseOrderRecordRepository poRepository,
-                                 DeliveryRecordRepository deliveryRepository,
-                                 SupplierProfileRepository supplierProfileRepository,
-                                 SupplierRiskAlertService riskAlertService) {
-        this.delayScoreRecordRepository = delayScoreRecordRepository;
-        this.poRepository = poRepository;
-        this.deliveryRepository = deliveryRepository;
-        this.supplierProfileRepository = supplierProfileRepository;
+    public DelayScoreServiceImpl(DelayScoreRecordRepository delayScoreRepo, 
+                                PurchaseOrderRecordRepository poRepo,
+                                DeliveryRecordRepository deliveryRepo, 
+                                SupplierProfileRepository supplierRepo,
+                                SupplierRiskAlertService riskAlertService) {
+        this.delayScoreRepo = delayScoreRepo;
+        this.poRepo = poRepo;
+        this.deliveryRepo = deliveryRepo;
+        this.supplierRepo = supplierRepo;
         this.riskAlertService = riskAlertService;
     }
 
     @Override
     public DelayScoreRecord computeDelayScore(Long poId) {
-        PurchaseOrderRecord po = poRepository.findById(poId)
-                .orElseThrow(() -> new ResourceNotFoundException("Purchase order not found"));
+        PurchaseOrderRecord po = poRepo.findById(poId)
+                .orElseThrow(() -> new BadRequestException("Invalid PO id"));
 
-        SupplierProfile supplier = supplierProfileRepository.findById(po.getSupplierId())
+        SupplierProfile supplier = supplierRepo.findById(po.getSupplierId())
                 .orElseThrow(() -> new BadRequestException("Invalid supplierId"));
 
-        if (!Boolean.TRUE.equals(supplier.getActive())) {
+        if (!supplier.getActive()) {
             throw new BadRequestException("Inactive supplier");
         }
 
-        List<DeliveryRecord> deliveries = deliveryRepository.findByPoId(poId);
+        List<DeliveryRecord> deliveries = deliveryRepo.findByPoId(poId);
         if (deliveries.isEmpty()) {
             throw new BadRequestException("No deliveries");
         }
 
-        DeliveryRecord latest = deliveries.stream()
-                .max(Comparator.comparing(DeliveryRecord::getActualDeliveryDate))
-                .orElseThrow(() -> new BadRequestException("No deliveries"));
+        // Logic: Use the latest delivery date for delay calculation
+        DeliveryRecord latestDelivery = deliveries.stream()
+                .max((d1, d2) -> d1.getActualDeliveryDate().compareTo(d2.getActualDeliveryDate()))
+                .get();
 
-        LocalDate promised = po.getPromisedDeliveryDate();
-        LocalDate actual = latest.getActualDeliveryDate();
+        long daysBetween = ChronoUnit.DAYS.between(po.getPromisedDeliveryDate(), latestDelivery.getActualDeliveryDate());
+        int delayDays = (int) Math.max(0, daysBetween);
 
-        int delayDays = (int) (actual.toEpochDay() - promised.toEpochDay());
-        if (delayDays < 0) {
-            delayDays = 0;
-        }
+        DelayScoreRecord record = new DelayScoreRecord();
+        record.setPoId(poId);
+        record.setSupplierId(po.getSupplierId());
+        record.setDelayDays(delayDays);
 
-        String severity;
-        if (delayDays == 0) {
-            severity = "ON_TIME";
+        // Scoring rules 
+        if (delayDays <= 0) {
+            record.setDelaySeverity("ON_TIME");
+            record.setScore(100.0);
         } else if (delayDays <= 3) {
-            severity = "MINOR";
+            record.setDelaySeverity("MINOR");
+            record.setScore(75.0);
         } else if (delayDays <= 7) {
-            severity = "MODERATE";
+            record.setDelaySeverity("MODERATE");
+            record.setScore(50.0);
         } else {
-            severity = "SEVERE";
+            record.setDelaySeverity("SEVERE");
+            record.setScore(0.0);
         }
 
-        double score = 100.0 - (delayDays * 5.0);
-        if (score < 0.0) {
-            score = 0.0;
-        }
-
-        DelayScoreRecord record =
-                new DelayScoreRecord(supplier.getId(), poId, delayDays, severity, score);
-
-        DelayScoreRecord saved = delayScoreRecordRepository.save(record);
-
-        if ("SEVERE".equals(severity)) {
-            SupplierRiskAlert alert = new SupplierRiskAlert(
-                    supplier.getId(),
-                    "HIGH",
-                    "Severe delay detected for PO " + po.getPoNumber()
-            );
-            riskAlertService.createAlert(alert);
-        }
-
+        DelayScoreRecord saved = delayScoreRepo.save(record);
+        updateSupplierRiskStatus(po.getSupplierId());
         return saved;
     }
 
-    @Override
-    public List<DelayScoreRecord> getScoresBySupplier(Long supplierId) {
-        return delayScoreRecordRepository.findBySupplierId(supplierId);
-    }
+    private void updateSupplierRiskStatus(Long supplierId) {
+        List<DelayScoreRecord> scores = delayScoreRepo.findBySupplierId(supplierId);
+        if (scores.isEmpty()) return;
 
-    @Override
-    public List<DelayScoreRecord> getAllScores() {
-        return delayScoreRecordRepository.findAll();
+        double avgScore = scores.stream().mapToDouble(DelayScoreRecord::getScore).average().orElse(0.0);
+        String level;
+        
+        // Risk levels 
+        if (avgScore >= 75) level = "LOW";
+        else if (avgScore >= 50) level = "MEDIUM";
+        else level = "HIGH";
+
+        SupplierRiskAlert alert = new SupplierRiskAlert();
+        alert.setSupplierId(supplierId);
+        alert.setAlertLevel(level);
+        alert.setMessage("Performance alert: Average score " + avgScore);
+        riskAlertService.createAlert(alert);
     }
 }
