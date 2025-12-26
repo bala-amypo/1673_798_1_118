@@ -22,6 +22,17 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
+    // Overloaded method for tests that pass AppUser directly
+    public String generateToken(AppUser user) {
+        Authentication authentication = org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .authorities("ROLE_" + user.getRole())
+                .build();
+        return generateToken(authentication);
+    }
+
+    // Original method for Authentication objects
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
         Date now = new Date();
