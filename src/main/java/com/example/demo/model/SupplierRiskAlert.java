@@ -1,29 +1,56 @@
-ovider.java: Recompile with -Xlint:deprecation for details.
-[INFO] -------------------------------------------------------------
-[ERROR] COMPILATION ERROR : 
-[INFO] -------------------------------------------------------------
-[ERROR] /home/coder/Workspace/demo/src/main/java/com/example/demo/service/impl/DelayScoreServiceImpl.java:[87,39] constructor SupplierRiskAlert in class com.example.demo.model.SupplierRiskAlert cannot be applied to given types;
-  required: no arguments
-  found:    java.lang.Long,java.lang.String,java.lang.String
-  reason: actual and formal argument lists differ in length
-[INFO] 1 error
-[INFO] -------------------------------------------------------------
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD FAILURE
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  23.696 s
-[INFO] Finished at: 2025-12-26T09:14:04Z
-[INFO] ------------------------------------------------------------------------
-[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project demo: Compilation failure
-[ERROR] /home/coder/Workspace/demo/src/main/java/com/example/demo/service/impl/DelayScoreServiceImpl.java:[87,39] constructor SupplierRiskAlert in class com.example.demo.model.SupplierRiskAlert cannot be applied to given types;
-[ERROR]   required: no arguments
-[ERROR]   found:    java.lang.Long,java.lang.String,java.lang.String
-[ERROR]   reason: actual and formal argument lists differ in length
-[ERROR] 
-[ERROR] -> [Help 1]
-[ERROR] 
-[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
-[ERROR] Re-run Maven using the -X switch to enable full debug logging.
-[ERROR] 
-[ERROR] For more information about the errors and possible solutions, please read the following articles:
-[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+package com.example.demo.model;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "supplier_risk_alerts")
+public class SupplierRiskAlert {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    private Long supplierId;
+
+    private String alertLevel; // LOW, MEDIUM, HIGH
+
+    @NotBlank
+    @Size(max = 500)
+    private String message;
+
+    private LocalDateTime alertDate;
+
+    private Boolean resolved = false;
+
+    @PrePersist
+    protected void onCreate() {
+        alertDate = LocalDateTime.now();
+    }
+
+    // Standard JavaBean Pattern: Default no-argument constructor 
+    public SupplierRiskAlert() {}
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getSupplierId() { return supplierId; }
+    public void setSupplierId(Long supplierId) { this.supplierId = supplierId; }
+
+    public String getAlertLevel() { return alertLevel; }
+    public void setAlertLevel(String alertLevel) { this.alertLevel = alertLevel; }
+
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+
+    public LocalDateTime getAlertDate() { return alertDate; }
+    public void setAlertDate(LocalDateTime alertDate) { this.alertDate = alertDate; }
+
+    public Boolean getResolved() { return resolved; }
+    public void setResolved(Boolean resolved) { this.resolved = resolved; }
+}
