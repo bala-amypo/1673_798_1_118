@@ -18,9 +18,6 @@ public class SwaggerConfig {
                         .description("API for managing suppliers, purchase orders, deliveries, and risk alerts"))
                 .addServersItem(new Server()
                         .url("https://9198.pro604cr.amypo.ai")
-                        .description("Production Server"))
-                .addServersItem(new Server()
-                        .url("http://localhost:8081")
-                        .description("Local Development Server"));
+                        .description(""))
     }
 }
