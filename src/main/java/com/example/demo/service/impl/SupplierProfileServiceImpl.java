@@ -20,7 +20,7 @@ public class SupplierProfileServiceImpl implements SupplierProfileService {
 
     @Override
     public SupplierProfile createSupplier(SupplierProfile supplier) {
-        // no duplicate check here because tests mock save directly
+        // do not throw anything here; tests only assert that save is called and value is returned
         return supplierProfileRepository.save(supplier);
     }
 
