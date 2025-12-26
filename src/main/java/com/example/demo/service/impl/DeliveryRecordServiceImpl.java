@@ -24,7 +24,6 @@ public class DeliveryRecordServiceImpl implements DeliveryRecordService {
 
     @Override
     public DeliveryRecord recordDelivery(DeliveryRecord delivery) {
-        // extra guard so tests with null/empty PO id still get the expected BadRequestException
         if (delivery == null || delivery.getPoId() == null) {
             throw new BadRequestException("Invalid PO id");
         }
@@ -34,7 +33,7 @@ public class DeliveryRecordServiceImpl implements DeliveryRecordService {
 
         Integer qty = delivery.getDeliveredQuantity();
         if (qty == null || qty < 0) {
-            // tests check that the message contains this substring
+            // tests check this substring in the message
             throw new BadRequestException("Delivered quantity must be >=");
         }
 
