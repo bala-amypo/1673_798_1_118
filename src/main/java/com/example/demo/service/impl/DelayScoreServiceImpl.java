@@ -8,6 +8,7 @@ import com.example.demo.service.SupplierRiskAlertService;
 import org.springframework.stereotype.Service;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DelayScoreServiceImpl implements DelayScoreService {
@@ -18,6 +19,7 @@ public class DelayScoreServiceImpl implements DelayScoreService {
     private final SupplierProfileRepository supplierRepo;
     private final SupplierRiskAlertService riskAlertService;
 
+    // Constructor Injection
     public DelayScoreServiceImpl(DelayScoreRecordRepository delayScoreRepo, 
                                 PurchaseOrderRecordRepository poRepo,
                                 DeliveryRecordRepository deliveryRepo, 
@@ -32,35 +34,39 @@ public class DelayScoreServiceImpl implements DelayScoreService {
 
     @Override
     public DelayScoreRecord computeDelayScore(Long poId) {
+        // Validation: Invalid PO id
         PurchaseOrderRecord po = poRepo.findById(poId)
-                .orElseThrow(() -> new BadRequestException("Invalid PO id")); [cite: 450, 783]
+                .orElseThrow(() -> new BadRequestException("Invalid PO id"));
 
+        // Validation: Invalid supplierId
         SupplierProfile supplier = supplierRepo.findById(po.getSupplierId())
-                .orElseThrow(() -> new BadRequestException("Invalid supplierId")); [cite: 135, 1037]
+                .orElseThrow(() -> new BadRequestException("Invalid supplierId"));
 
-        if (!supplier.getActive()) {
-            throw new BadRequestException("Inactive supplier"); [cite: 451, 1040]
+        // Validation: Inactive supplier
+        if (supplier.getActive() == null || !supplier.getActive()) {
+            throw new BadRequestException("Inactive supplier");
         }
 
-        List<DeliveryRecord> deliveries = deliveryRepo.findByPoId(poId); [cite: 326]
+        // Validation: No deliveries
+        List<DeliveryRecord> deliveries = deliveryRepo.findByPoId(poId);
         if (deliveries.isEmpty()) {
-            throw new BadRequestException("No deliveries"); [cite: 452, 1039]
+            throw new BadRequestException("No deliveries");
         }
 
-        // Use the latest delivery for delay calculation [cite: 970]
+        // Logic: Use latest delivery for delay calculation
         DeliveryRecord latestDelivery = deliveries.stream()
                 .max((d1, d2) -> d1.getActualDeliveryDate().compareTo(d2.getActualDeliveryDate()))
                 .get();
 
         long daysBetween = ChronoUnit.DAYS.between(po.getPromisedDeliveryDate(), latestDelivery.getActualDeliveryDate());
-        int delayDays = (int) daysBetween; [cite: 971]
+        int delayDays = (int) Math.max(0, daysBetween);
 
         DelayScoreRecord record = new DelayScoreRecord();
         record.setPoId(poId);
         record.setSupplierId(po.getSupplierId());
         record.setDelayDays(delayDays);
 
-        // Severity and scoring logic [cite: 972, 973]
+        // Scoring rules
         if (delayDays <= 0) {
             record.setDelaySeverity("ON_TIME");
             record.setScore(100.0);
@@ -76,24 +82,23 @@ public class DelayScoreServiceImpl implements DelayScoreService {
         }
 
         DelayScoreRecord saved = delayScoreRepo.save(record);
-        updateSupplierRiskStatus(po.getSupplierId()); [cite: 551]
+        updateSupplierRiskStatus(po.getSupplierId());
         return saved;
     }
 
     @Override
     public List<DelayScoreRecord> getScoresBySupplier(Long supplierId) {
-        return delayScoreRepo.findBySupplierId(supplierId); [cite: 342, 456]
+        return delayScoreRepo.findBySupplierId(supplierId);
     }
 
     @Override
-    public java.util.Optional<DelayScoreRecord> getScoreById(Long id) {
-        return delayScoreRepo.findById(id); [cite: 458]
+    public Optional<DelayScoreRecord> getScoreById(Long id) {
+        return delayScoreRepo.findById(id);
     }
 
-    // This method resolves the "is not abstract and does not override" error
     @Override
     public List<DelayScoreRecord> getAllScores() {
-        return delayScoreRepo.findAll(); [cite: 461, 463]
+        return delayScoreRepo.findAll();
     }
 
     private void updateSupplierRiskStatus(Long supplierId) {
@@ -101,18 +106,18 @@ public class DelayScoreServiceImpl implements DelayScoreService {
         if (scores.isEmpty()) return;
 
         double avgScore = scores.stream().mapToDouble(DelayScoreRecord::getScore).average().orElse(0.0);
-        String level;
         
-        // Risk level thresholds [cite: 977-980]
+        // Risk levels per SRS
+        String level;
         if (avgScore >= 75) level = "LOW";
         else if (avgScore >= 50) level = "MEDIUM";
         else level = "HIGH";
 
-        // Corrected instantiation using default constructor
-        SupplierRiskAlert alert = new SupplierRiskAlert(); [cite: 249]
+        // Resolved previous constructor error by using setters
+        SupplierRiskAlert alert = new SupplierRiskAlert();
         alert.setSupplierId(supplierId);
         alert.setAlertLevel(level);
         alert.setMessage("Performance alert: Average score " + avgScore);
-        riskAlertService.createAlert(alert); [cite: 467]
+        riskAlertService.createAlert(alert);
     }
 }
