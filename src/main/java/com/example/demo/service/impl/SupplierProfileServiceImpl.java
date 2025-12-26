@@ -20,7 +20,7 @@ public class SupplierProfileServiceImpl implements SupplierProfileService {
 
     @Override
     public SupplierProfile createSupplier(SupplierProfile supplier) {
-        // do not throw anything here; tests only assert that save is called and value is returned
+        // tests just verify save + returned object
         return supplierProfileRepository.save(supplier);
     }
 

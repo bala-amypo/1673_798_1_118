@@ -7,6 +7,7 @@ import com.example.demo.repository.*;
 import com.example.demo.service.DelayScoreService;
 import com.example.demo.service.SupplierRiskAlertService;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -21,10 +22,10 @@ public class DelayScoreServiceImpl implements DelayScoreService {
     private final SupplierRiskAlertService riskAlertService;
 
     public DelayScoreServiceImpl(DelayScoreRecordRepository delayScoreRecordRepository,
-                                PurchaseOrderRecordRepository poRepository,
-                                DeliveryRecordRepository deliveryRepository,
-                                SupplierProfileRepository supplierProfileRepository,
-                                SupplierRiskAlertService riskAlertService) {
+                                 PurchaseOrderRecordRepository poRepository,
+                                 DeliveryRecordRepository deliveryRepository,
+                                 SupplierProfileRepository supplierProfileRepository,
+                                 SupplierRiskAlertService riskAlertService) {
         this.delayScoreRecordRepository = delayScoreRecordRepository;
         this.poRepository = poRepository;
         this.deliveryRepository = deliveryRepository;
@@ -55,25 +56,39 @@ public class DelayScoreServiceImpl implements DelayScoreService {
 
         LocalDate promised = po.getPromisedDeliveryDate();
         LocalDate actual = latest.getActualDeliveryDate();
+
         int delayDays = (int) (actual.toEpochDay() - promised.toEpochDay());
-        if (delayDays < 0) delayDays = 0;
+        if (delayDays < 0) {
+            delayDays = 0;
+        }
 
         String severity;
-        if (delayDays == 0) severity = "ONTIME";
-        else if (delayDays <= 3) severity = "MINOR";
-        else if (delayDays <= 7) severity = "MODERATE";
-        else severity = "SEVERE";
+        if (delayDays == 0) {
+            severity = "ON_TIME";
+        } else if (delayDays <= 3) {
+            severity = "MINOR";
+        } else if (delayDays <= 7) {
+            severity = "MODERATE";
+        } else {
+            severity = "SEVERE";
+        }
 
         double score = 100.0 - (delayDays * 5.0);
-        if (score < 0.0) score = 0.0;
+        if (score < 0.0) {
+            score = 0.0;
+        }
 
-        DelayScoreRecord record = new DelayScoreRecord(
-                supplier.getId(), poId, delayDays, severity, score);
+        DelayScoreRecord record =
+                new DelayScoreRecord(supplier.getId(), poId, delayDays, severity, score);
+
         DelayScoreRecord saved = delayScoreRecordRepository.save(record);
 
         if ("SEVERE".equals(severity)) {
             SupplierRiskAlert alert = new SupplierRiskAlert(
-                    supplier.getId(), "HIGH", "Severe delay detected for PO " + po.getPoNumber());
+                    supplier.getId(),
+                    "HIGH",
+                    "Severe delay detected for PO " + po.getPoNumber()
+            );
             riskAlertService.createAlert(alert);
         }
 
