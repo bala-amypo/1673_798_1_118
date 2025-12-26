@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface DelayScoreRecordRepository extends JpaRepository<DelayScoreRecord, Long> {
     List<DelayScoreRecord> findBySupplierId(Long supplierId);
+    List<DelayScoreRecord> findByPoId(Long poId);
 }
