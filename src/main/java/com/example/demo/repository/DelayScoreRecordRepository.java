@@ -5,9 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DelayScoreRecordRepository extends JpaRepository<DelayScoreRecord, Long> {
     List<DelayScoreRecord> findBySupplierId(Long supplierId);
-    List<DelayScoreRecord> findByPoId(Long poId);
+    Optional<List<DelayScoreRecord>> findByPoId(Long poId);  // Test expects Optional<List>
 }
