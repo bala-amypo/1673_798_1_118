@@ -23,7 +23,7 @@ public class SupplierRiskAlert {
     private LocalDateTime alertDate;
 
     @Column(nullable = false)
-    private Boolean resolved = false;
+    private Boolean resolved = false; // Required for default check
 
     public SupplierRiskAlert() {}
 
@@ -35,11 +35,11 @@ public class SupplierRiskAlert {
 
     @PrePersist
     protected void onCreate() {
-        if (alertDate == null) alertDate = LocalDateTime.now(); //
-        if (resolved == null) resolved = false; //
+        if (alertDate == null) alertDate = LocalDateTime.now();
+        if (resolved == null) resolved = false; // Crucial for testAlertCreationDefaultResolvedFalse
     }
 
-    // Getters/Setters
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getSupplierId() { return supplierId; }
