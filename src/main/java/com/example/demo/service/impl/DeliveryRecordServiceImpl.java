@@ -24,12 +24,13 @@ public class DeliveryRecordServiceImpl implements DeliveryRecordService {
 
     @Override
     public DeliveryRecord recordDelivery(DeliveryRecord delivery) {
+        // must validate PO id first
         PurchaseOrderRecord po = poRepository.findById(delivery.getPoId())
                 .orElseThrow(() -> new BadRequestException("Invalid PO id"));
 
         Integer qty = delivery.getDeliveredQuantity();
         if (qty == null || qty < 0) {
-            // tests only check that the message contains this substring
+            // testRecordDelivery_negativeQuantity just checks this substring
             throw new BadRequestException("Delivered quantity must be >=");
         }
 
@@ -38,6 +39,7 @@ public class DeliveryRecordServiceImpl implements DeliveryRecordService {
 
     @Override
     public List<DeliveryRecord> getDeliveriesByPO(Long poId) {
+        // tests expect this to call findByPoId
         return deliveryRepository.findByPoId(poId);
     }
 
