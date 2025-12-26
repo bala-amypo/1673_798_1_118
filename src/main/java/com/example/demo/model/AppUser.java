@@ -20,15 +20,13 @@ public class AppUser {
     @Column(nullable = false)
     private String password;
 
-    // Stored as String, but we also accept Role enum in setter for tests
     @Column(nullable = false)
     private String role;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    public AppUser() {
-    }
+    public AppUser() {}
 
     public AppUser(String username, String email, String password, String role) {
         this.username = username;
@@ -45,58 +43,16 @@ public class AppUser {
     }
 
     // Getters and Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    // normal String setter (used by your code)
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    // overloaded setter so tests can call setRole(Role.ANALYST)
-    public void setRole(Role role) {
-        this.role = (role != null ? role.name() : null);
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
