@@ -7,6 +7,7 @@ import com.example.demo.service.DelayScoreService;
 import com.example.demo.service.SupplierRiskAlertService;
 import org.springframework.stereotype.Service;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public class DelayScoreServiceImpl implements DelayScoreService {
     private final SupplierProfileRepository supplierRepo;
     private final SupplierRiskAlertService riskAlertService;
 
-    // Constructor Injection
+    // Constructor injection as required by the test setup [cite: 195-201]
     public DelayScoreServiceImpl(DelayScoreRecordRepository delayScoreRepo, 
                                 PurchaseOrderRecordRepository poRepo,
                                 DeliveryRecordRepository deliveryRepo, 
@@ -34,28 +35,28 @@ public class DelayScoreServiceImpl implements DelayScoreService {
 
     @Override
     public DelayScoreRecord computeDelayScore(Long poId) {
-        // Validation: Invalid PO id
+        // Validation: PO must exist [cite: 362, 927]
         PurchaseOrderRecord po = poRepo.findById(poId)
                 .orElseThrow(() -> new BadRequestException("Invalid PO id"));
 
-        // Validation: Invalid supplierId
+        // Validation: Supplier must exist [cite: 299, 925]
         SupplierProfile supplier = supplierRepo.findById(po.getSupplierId())
                 .orElseThrow(() -> new BadRequestException("Invalid supplierId"));
 
-        // Validation: Inactive supplier
+        // Validation: Supplier must be active [cite: 315, 926, 929]
         if (supplier.getActive() == null || !supplier.getActive()) {
             throw new BadRequestException("Inactive supplier");
         }
 
-        // Validation: No deliveries
+        // Validation: Deliveries must exist 
         List<DeliveryRecord> deliveries = deliveryRepo.findByPoId(poId);
         if (deliveries.isEmpty()) {
             throw new BadRequestException("No deliveries");
         }
 
-        // Logic: Use latest delivery for delay calculation
+        // Logic: Use latest delivery for delay calculation [cite: 1158]
         DeliveryRecord latestDelivery = deliveries.stream()
-                .max((d1, d2) -> d1.getActualDeliveryDate().compareTo(d2.getActualDeliveryDate()))
+                .max(Comparator.comparing(DeliveryRecord::getActualDeliveryDate))
                 .get();
 
         long daysBetween = ChronoUnit.DAYS.between(po.getPromisedDeliveryDate(), latestDelivery.getActualDeliveryDate());
@@ -66,7 +67,7 @@ public class DelayScoreServiceImpl implements DelayScoreService {
         record.setSupplierId(po.getSupplierId());
         record.setDelayDays(delayDays);
 
-        // Scoring rules
+        // Scoring rules [cite: 928, 929]
         if (delayDays <= 0) {
             record.setDelaySeverity("ON_TIME");
             record.setScore(100.0);
@@ -105,15 +106,17 @@ public class DelayScoreServiceImpl implements DelayScoreService {
         List<DelayScoreRecord> scores = delayScoreRepo.findBySupplierId(supplierId);
         if (scores.isEmpty()) return;
 
-        double avgScore = scores.stream().mapToDouble(DelayScoreRecord::getScore).average().orElse(0.0);
+        double avgScore = scores.stream()
+                .mapToDouble(DelayScoreRecord::getScore)
+                .average()
+                .orElse(0.0);
         
-        // Risk levels per SRS
+        // Risk levels based on average score 
         String level;
         if (avgScore >= 75) level = "LOW";
         else if (avgScore >= 50) level = "MEDIUM";
         else level = "HIGH";
 
-        // Resolved previous constructor error by using setters
         SupplierRiskAlert alert = new SupplierRiskAlert();
         alert.setSupplierId(supplierId);
         alert.setAlertLevel(level);
