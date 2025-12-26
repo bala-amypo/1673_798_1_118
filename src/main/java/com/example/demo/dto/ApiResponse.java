@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-public class ApiErrorResponse {
+public class ApiResponse {
     private String message;
     private int status;
 
