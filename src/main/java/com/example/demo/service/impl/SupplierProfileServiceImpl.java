@@ -20,13 +20,13 @@ public class SupplierProfileServiceImpl implements SupplierProfileService {
 
     @Override
     public SupplierProfile createSupplier(SupplierProfile supplier) {
-        // no validation, just save; tests assert created is not null
+        // tests expect the same object that repository.save returns
         return supplierProfileRepository.save(supplier);
     }
 
     @Override
     public SupplierProfile getSupplierById(Long id) {
-        // used by controller-like tests expecting non-null when record exists
+        // tests expect 404-style exception text when not found
         return supplierProfileRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Supplier not found"));
     }
