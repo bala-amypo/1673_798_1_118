@@ -20,7 +20,6 @@ public class SupplierProfileServiceImpl implements SupplierProfileService {
 
     @Override
     public SupplierProfile createSupplier(SupplierProfile supplier) {
-        // must just save and return, no extra checks
         return supplierProfileRepository.save(supplier);
     }
 
